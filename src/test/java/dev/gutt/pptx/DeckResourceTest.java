@@ -78,17 +78,17 @@ class DeckResourceTest {
 
     XMLSlideShow ppt = new XMLSlideShow(new ByteArrayInputStream(body));
 
-    XSLFSlide slide = ppt.getSlides().get(0);
+    XSLFSlide slide = ppt.getSlides().getFirst();
 
     assertThat(slide.getShapes().size(), is(2));
 
-    XSLFTextBox title = (XSLFTextBox) slide.getShapes().get(0);
+    XSLFTextBox title = (XSLFTextBox) slide.getShapes().getFirst();
     assertThat(title.getAnchor(), is(new Rectangle2D.Double(60, 200, 840, 120)));
 
     XSLFTextParagraph titlePara = lastParagraph(title);
     assertThat(titlePara.getTextAlign(), is(TextAlign.CENTER));
 
-    XSLFTextRun titleRun = titlePara.getTextRuns().get(0);
+    XSLFTextRun titleRun = titlePara.getTextRuns().getFirst();
     assertThat(titleRun.getRawText(), is(expected.title()));
     assertThat(titleRun.getFontSize(), is(40.0));
     assertThat(titleRun.isBold(), is(true));
@@ -100,7 +100,7 @@ class DeckResourceTest {
     XSLFTextParagraph subtitlePara = lastParagraph(subtitle);
     assertThat(subtitlePara.getTextAlign(), is(TextAlign.CENTER));
 
-    XSLFTextRun subtitleRun = subtitlePara.getTextRuns().get(0);
+    XSLFTextRun subtitleRun = subtitlePara.getTextRuns().getFirst();
     assertThat(subtitleRun.getRawText(), is(expected.subtitle()));
     assertThat(subtitleRun.getFontSize(), is(20.0));
     assertThat(subtitleRun.isItalic(), is(true));
@@ -142,7 +142,7 @@ class DeckResourceTest {
       assertThat(para.getLeftMargin(), is(18.0));
       assertThat(para.getSpaceAfter(), is(12.0));
 
-      XSLFTextRun run = para.getTextRuns().get(0);
+      XSLFTextRun run = para.getTextRuns().getFirst();
       assertThat(run.getRawText(), is(points.get(i)));
       assertThat(run.getFontSize(), is(18.0));
     }
@@ -239,10 +239,10 @@ class DeckResourceTest {
 
   private static void assertHeading(XSLFSlide slide, String text) {
 
-    XSLFTextBox heading = (XSLFTextBox) slide.getShapes().get(0);
+    XSLFTextBox heading = (XSLFTextBox) slide.getShapes().getFirst();
     assertThat(heading.getAnchor(), is(new Rectangle2D.Double(40, 25, 880, 60)));
 
-    XSLFTextRun run = lastParagraph(heading).getTextRuns().get(0);
+    XSLFTextRun run = lastParagraph(heading).getTextRuns().getFirst();
     assertThat(run.getRawText(), is(text));
     assertThat(run.getFontSize(), is(28.0));
     assertThat(run.isBold(), is(true));
