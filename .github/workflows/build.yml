@@ -18,5 +18,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      # PIT threads = nproc. Each thread runs its own JVM (Quarkus boot per thread), so if
+      # runners get large, cap it, e.g. -Dpitest.threads=$(( $(nproc) > 4 ? 4 : $(nproc) ))
+      # Locally, pitest.threads defaults to 1 (see pom.xml).
       - name: Build with Maven
-        run: ./mvnw -B verify
+        run: ./mvnw -B verify -Dpitest.threads=$(nproc)

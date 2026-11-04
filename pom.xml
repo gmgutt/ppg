@@ -25,6 +25,7 @@
         <pitest-junit5.version>1.2.3</pitest-junit5.version>
         <coverage.minimum>0.80</coverage.minimum>
         <mutation.threshold>80</mutation.threshold>
+        <pitest.threads>1</pitest.threads>
     </properties>
 
     <dependencyManagement>
@@ -205,6 +206,7 @@
                         <param>dev.gutt.*</param>
                     </targetClasses>
                     <mutationThreshold>${mutation.threshold}</mutationThreshold>
+                    <threads>${pitest.threads}</threads>
                 </configuration>
             </plugin>
             <plugin>
