@@ -7,5 +7,5 @@ public record DeckData(
     String title,
     String subtitle,
     List<String> executiveSummaryPoints,
-    String[] years,
+    List<String> years,
     List<PerformanceDeckGenerator.MetricChart> metricCharts) {}

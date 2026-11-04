@@ -49,30 +49,31 @@ public final class PerformanceDeckGenerator {
   private static final int YEAR_COUNT = 4;
   private static final Logger log = LoggerFactory.getLogger(PerformanceDeckGenerator.class);
 
-  public record MetricChart(String title, String axisTitle, double[] values) {
+  public record MetricChart(String title, String axisTitle, List<Double> values) {
     public MetricChart {
-      if (values.length != YEAR_COUNT) {
+      if (values.size() != YEAR_COUNT) {
         throw new IllegalArgumentException(
-            "expected " + YEAR_COUNT + " yearly values, got " + values.length);
+            "expected " + YEAR_COUNT + " yearly values, got " + values.size());
       }
+      values = List.copyOf(values);
     }
   }
 
   private final String title;
   private final String subtitle;
   private final List<String> executiveSummaryPoints;
-  private final String[] years;
+  private final List<String> years;
   private final List<MetricChart> metricCharts;
 
   public PerformanceDeckGenerator(
       String title,
       String subtitle,
       List<String> executiveSummaryPoints,
-      String[] years,
+      List<String> years,
       List<MetricChart> metricCharts) {
-    if (years.length != YEAR_COUNT) {
+    if (years.size() != YEAR_COUNT) {
       throw new IllegalArgumentException(
-          "expected " + YEAR_COUNT + " year labels, got " + years.length);
+          "expected " + YEAR_COUNT + " year labels, got " + years.size());
     }
     if (metricCharts.isEmpty()) {
       throw new IllegalArgumentException("at least one metric chart is required");
@@ -80,7 +81,7 @@ public final class PerformanceDeckGenerator {
     this.title = title;
     this.subtitle = subtitle;
     this.executiveSummaryPoints = List.copyOf(executiveSummaryPoints);
-    this.years = years.clone();
+    this.years = List.copyOf(years);
     this.metricCharts = List.copyOf(metricCharts);
   }
 
@@ -148,7 +149,7 @@ public final class PerformanceDeckGenerator {
 
   private void addChartSlide(XMLSlideShow ppt, MetricChart metric) {
     XSLFSlide slide = ppt.createSlide();
-    addSlideHeading(slide, metric.title() + " — " + years[0] + "–" + years[years.length - 1]);
+    addSlideHeading(slide, metric.title() + " — " + years.getFirst() + "–" + years.getLast());
 
     XSLFChart chart = ppt.createChart();
     double marginPt = 50;
@@ -169,13 +170,13 @@ public final class PerformanceDeckGenerator {
     leftAxis.setMajorTickMark(AxisTickMark.OUT);
     leftAxis.setCrossBetween(AxisCrossBetween.BETWEEN);
 
-    int n = years.length;
+    int n = years.size();
     String categoryRange = chart.formatRange(new CellRangeAddress(1, n, 0, 0));
     String valueRange = chart.formatRange(new CellRangeAddress(1, n, 1, 1));
     XDDFDataSource<String> categoriesData =
-        XDDFDataSourcesFactory.fromArray(years, categoryRange, 0);
+        XDDFDataSourcesFactory.fromArray(years.toArray(String[]::new), categoryRange, 0);
     XDDFNumericalDataSource<Double> valuesData =
-        XDDFDataSourcesFactory.fromArray(boxValues(metric.values()), valueRange, 1);
+        XDDFDataSourcesFactory.fromArray(metric.values().toArray(Double[]::new), valueRange, 1);
 
     XDDFBarChartData bar =
         (XDDFBarChartData) chart.createData(ChartTypes.BAR, bottomAxis, leftAxis);
