@@ -20,6 +20,7 @@
         <spotless.version>3.11.0</spotless.version>
         <google-java-format.version>2.0.0</google-java-format.version>
         <jacoco.version>0.8.13</jacoco.version>
+        <errorprone.version>2.52.0</errorprone.version>
         <pitest.version>1.30.1</pitest.version>
         <pitest-junit5.version>1.2.3</pitest-junit5.version>
         <coverage.minimum>0.80</coverage.minimum>
@@ -97,6 +98,22 @@
                 <version>${compiler-plugin.version}</version>
                 <configuration>
                     <parameters>true</parameters>
+                    <showWarnings>true</showWarnings>
+                    <failOnWarning>true</failOnWarning>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+                        <arg>--should-stop=ifError=FLOW</arg>
+                        <!-- the jdk.compiler export and open flags Error Prone needs are in .mvn/jvm.config -->
+                        <arg>-Xplugin:ErrorProne</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${errorprone.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

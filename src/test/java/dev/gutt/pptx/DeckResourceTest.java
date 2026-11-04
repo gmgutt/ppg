@@ -14,10 +14,8 @@ import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.poi.sl.usermodel.PaintStyle.SolidPaint;
@@ -171,8 +169,7 @@ class DeckResourceTest {
                   XSLFSlide slide = ppt.getSlides().get(i + 2);
                   PerformanceDeckGenerator.MetricChart metric = expected.metricCharts().get(i);
 
-                  String years =
-                      expected.years()[0] + "–" + expected.years()[expected.years().length - 1];
+                  String years = expected.years().getFirst() + "–" + expected.years().getLast();
                   assertHeading(slide, metric.title() + " — " + years);
 
                   XSLFGraphicFrame frame = (XSLFGraphicFrame) slide.getShapes().get(1);
@@ -206,8 +203,8 @@ class DeckResourceTest {
                       xml,
                       stringContainsInOrder(
                           Stream.concat(
-                                  Arrays.stream(expected.years()),
-                                  DoubleStream.of(metric.values()).mapToObj(String::valueOf))
+                                  expected.years().stream(),
+                                  metric.values().stream().map(String::valueOf))
                               .map(v -> "<c:v>" + v + "</c:v>")
                               .toList()));
                   // category axis
