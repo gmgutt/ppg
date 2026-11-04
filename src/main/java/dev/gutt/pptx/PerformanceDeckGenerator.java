@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.poi.sl.usermodel.TextParagraph.TextAlign;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.util.Units;
@@ -204,109 +201,6 @@ public final class PerformanceDeckGenerator {
     run.setFontSize(28.0);
     run.setBold(true);
     run.setFontColor(ACCENT_COLOR);
-  }
-
-  private static Double[] boxValues(double[] values) {
-    Double[] boxed = new Double[values.length];
-    for (int i = 0; i < values.length; i++) {
-      boxed[i] = values[i];
-    }
-    return boxed;
-  }
-
-  /**
-   * A single labeled statistic, grouped under a category, with one pre-formatted value per year (in
-   * the same order as the years passed to {@link #describeStatistics}).
-   */
-  public record Statistic(String category, String label, List<String> values) {}
-
-  /**
-   * Renders a data set of statistics as a prompt-style text block, grouped by category, framed
-   * around describing the most recent year with earlier years as supporting context. This is
-   * intended to be handed to an LLM to produce a natural-language narrative of the data.
-   */
-  public static String describeStatistics(List<String> years, List<Statistic> statistics) {
-    if (years.isEmpty()) {
-      throw new IllegalArgumentException("at least one year is required");
-    }
-    if (statistics.isEmpty()) {
-      throw new IllegalArgumentException("at least one statistic is required");
-    }
-
-    Map<String, List<Statistic>> byCategory = new LinkedHashMap<>();
-    for (Statistic statistic : statistics) {
-      byCategory.computeIfAbsent(statistic.category(), c -> new ArrayList<>()).add(statistic);
-    }
-
-    String yearList = String.join(", ", years);
-    String mostRecentYear = years.getLast();
-
-    StringBuilder text = new StringBuilder();
-    text.append("Below is a data set with ")
-        .append(statistics.size())
-        .append(" metrics, each with one value per year\n")
-        .append("(")
-        .append(yearList)
-        .append(", in that order), grouped by the category in\n")
-        .append("their labels. Describe the data using only what is in this message.\n")
-        .append("The focus is the most recent year (")
-        .append(mostRecentYear)
-        .append("); earlier years are used only\n")
-        .append("as supporting context for ")
-        .append(mostRecentYear)
-        .append(".\n");
-
-    for (Map.Entry<String, List<Statistic>> entry : byCategory.entrySet()) {
-      text.append("\n").append(entry.getKey()).append("\n");
-      for (Statistic statistic : entry.getValue()) {
-        text.append("- ")
-            .append(statistic.label())
-            .append(": ")
-            .append(String.join(", ", statistic.values()))
-            .append("\n");
-      }
-    }
-
-    return text
-        + """
-
-        Output format (must fit on one presentation slide, 150 words maximum
-        in total):
-
-        - One headline sentence (30 words or fewer) about the 2026 values
-          across all categories.
-        - Exactly three bullets, one per category (category name first), each
-          40 words or fewer, naming the metrics whose 2026 values stand out
-          most against earlier years in that category, with the value and
-          comparison for each.
-        - One closing bullet (15 words or fewer) with the single most notable
-          comparison of 2026 against earlier years, across any metric.
-
-        Rules:
-        - Evaluate all 23 metrics before choosing what to report, but report
-          only the most notable ones. Notable means the largest change from
-          2025 to 2026, the highest or lowest 2026 value relative to earlier
-          years, or a 2026 value that reverses the earlier direction. Judge
-          this by the numbers in this data set only.
-        - Every statement must be about 2026. Earlier years may appear only as
-          a comparison point for 2026, never as the subject of a statement.
-        - Describe direction only as "increased" or "decreased". Do not say
-          improved, worsened, better, or worse, since the data does not say
-          which direction is favorable for any metric.
-        - Every comparison must be between values in this data set. Do not use
-          your own knowledge of what is typical, average, good, bad,
-          impressive, or unusual for any metric, sport, player, or league.
-        - Treat the labels as opaque names. Do not infer what the metrics
-          measure, what position is played, or what caused any change.
-        - Do not predict future values or assume anything about sample size,
-          playing time, or data quality.
-        - Output only the headline and four bullets. No introduction,
-          explanation, extra sections, or concluding remarks.
-        - Report numbers exactly as given. Compute percentage change only where
-          the starting value is nonzero.
-        - If you cannot fit something within the limits, omit it rather than
-          exceeding them.
-        """;
   }
 
   public static void main(String[] args) throws IOException {
