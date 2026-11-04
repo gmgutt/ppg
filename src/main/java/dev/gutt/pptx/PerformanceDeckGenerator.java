@@ -315,8 +315,8 @@ public final class PerformanceDeckGenerator {
 
   /**
    * Sample data sourced from Pete Crow-Armstrong's Standard Batting, Advanced Batting, and Standard
-   * Fielding tables (Chicago Cubs, 2023-2026):
-   * <a href="https://www.baseball-reference.com/players/c/crowape01.shtml">...</a>
+   * Fielding tables (Chicago Cubs, 2023-2026): <a
+   * href="https://www.baseball-reference.com/players/c/crowape01.shtml">...</a>
    */
   public static void main(String[] args) throws IOException {
     String[] years = {"2023", "2024", "2025", "2026"};
