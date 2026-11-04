@@ -19,6 +19,8 @@
         <poi.version>6.0.0</poi.version>
         <spotless.version>3.11.0</spotless.version>
         <google-java-format.version>2.0.0</google-java-format.version>
+        <jacoco.version>0.8.13</jacoco.version>
+        <coverage.minimum>0.80</coverage.minimum>
     </properties>
 
     <dependencyManagement>
@@ -49,6 +51,11 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jacoco</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -119,6 +126,37 @@
                         <goals>
                             <goal>check</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- Coverage data is collected by the quarkus-jacoco extension (needed for
+                     @QuarkusTest); this plugin only enforces the threshold on that data. -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>coverage-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco-quarkus.exec</dataFile>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>${coverage.minimum}</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
